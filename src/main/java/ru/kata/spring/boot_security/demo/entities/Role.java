@@ -1,4 +1,6 @@
 package ru.kata.spring.boot_security.demo.entities;
+
+
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.Column;
@@ -6,38 +8,37 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-import java.util.Set;
+import java.util.Objects;
 
 @Entity
-@Table(name = "roles")
- public class Role implements GrantedAuthority {
-
+@Table(name = "role")
+public class Role implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @Column(name = "name")
+    private long id;
+    @Column(name = "name", unique = true)
     private String name;
 
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> userSet;
-
-    public Role() {
+    public Role(long id) {
+        this.id = id;
     }
 
-    @Override
-    public String toString() {
-        return getName().substring(getName().indexOf('_') + 1);
+
+    public Role(String name) {
+        this.name = name;
     }
 
-    public Integer getId() {
+    public Role() {}
+
+    public long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -49,26 +50,22 @@ import java.util.Set;
         this.name = name;
     }
 
-    public Set<User> getUserSet() {
-        return userSet;
+    @Override
+    public String getAuthority() {
+        return getName();
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-    public void setUserSet(Set<User> userSet) {
-        this.userSet = userSet;
-    }
+        Role role = (Role) o;
 
-    public Role(String name) {
-        this.name = name;
-    }
-
-    public Role(String name, Set<User> userSet) {
-        this.name = name;
-        this.userSet = userSet;
+        return Objects.equals(name, role.name);
     }
 
     @Override
-    public String getAuthority() {
-        return name;
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
     }
 }
-
